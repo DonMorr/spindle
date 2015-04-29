@@ -141,7 +141,10 @@ EOF
 add_pi_user_to_groups() {
   onvm_chroot sh -l -ex - <<\EOF
 groupadd -f -r input
-for GRP in adm dialout cdrom audio users sudo video games plugdev input; do
+groupadd -f -r spi
+groupadd -f -r i2c
+groupadd -f -r gpio
+for GRP in adm dialout cdrom audio users sudo video games plugdev input gpio spi i2c; do
   adduser pi $GRP
 done
 EOF
@@ -154,9 +157,12 @@ sed -i /etc/default/useradd -e 's|^SHELL=.*$|SHELL=/bin/bash|'
 EOF
 }
 
-make_udev_input_rule() {
+make_udev_com_rule() {
   onvm_chroot sh -l -e - <<EOF
-printf 'SUBSYSTEM=="input", GROUP="input", MODE="0660"\n' > /etc/udev/rules.d/99-input.rules
+printf "SUBSYSTEM==\"gpio*\", PROGRAM=\"/bin/sh -c 'chown -R root:gpio /sys/class/gpio && chmod -R 770 /sys/class/gpio; chown -R root:gpio /sys/devices/virtual/gpio && chmod -R 770 /sys/devices/virtual/gpio'\"\n" > /etc/udev/rules.d/99-com.rules
+printf 'SUBSYSTEM=="input", GROUP="input", MODE="0660"\n' >> /etc/udev/rules.d/99-com.rules
+printf 'SUBSYSTEM=="i2c-dev", GROUP="i2c", MODE="0660"\n' >> /etc/udev/rules.d/99-com.rules
+printf 'SUBSYSTEM=="spidev", GROUP="spi", MODE="0660"\n' >> /etc/udev/rules.d/99-com.rules
 EOF
 }
 
@@ -420,7 +426,7 @@ dotask install_packages
 dotask configure_ifplugd
 dotask add_pi_user_to_groups
 dotask configure_useradd
-dotask make_udev_input_rule
+dotask make_udev_com_rule
 dotask configure_wifi
 #dotask add_opt_vc_lib_to_ld_so
 dotask setup_sudoers
