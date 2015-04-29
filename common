@@ -198,13 +198,20 @@ EOF
 {
   "name": "Raspbian",
   "version": "wheezy",
-  "release_date": "2015-02-16",
+  "release_date": "2015-05-05",
   "kernel": "3.18",
   "description": "A community-created port of Debian wheezy, optimised for the Raspberry Pi"
 }
 EOF
 
     cat <<\EOF > ../noobs/release_notes.txt
+2015-05-05:
+  * Updated UI changes
+  * Updated firmware
+  * Install raspberrypi-net-mods
+  * Install avahi-daemon
+  * Add user pi to new i2c and spi groups
+  * Modified udev rules for i2c and spi devices
 2015-02-16:
   * Newer firmware with various fixes
   * New Sonic Pi release
