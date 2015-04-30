@@ -73,26 +73,6 @@ chown -R pi:pi python_games
 EOF
 }
 
-# relies on the fact we made a Desktop directory in 
-# setup_python_game_examples
-setup_desktop_icons() {
-  onvm_chroot sh -l -e <<\EOF
-# We don't want desktop icons any more
-rm -rf /home/pi/Desktop
-EOF
-}
-
-# There are 2 menu entries for both of idle3 and idle2. Fix this
-hide_redundant_idle_menu_entries() {
-  onvm_chroot sh -l -e <<\EOF
-mkdir -p /usr/local/share/applications
-for ENTRY in /usr/share/applications/idle-python*.desktop; do
-  cp -a $ENTRY /usr/local/share/applications
-  printf "NoDisplay=true\n" >> "/usr/local/share/applications/$(basename $ENTRY)"
-done
-EOF
-}
-
 cd $WORKDIR
 dotask branch_image ../$OUTDIR/stage4-lxde.$IMGFORMAT $CURIMG
 dotask run_qemu $CURIMG
@@ -101,8 +81,6 @@ dotask mount_apt_cache
 dotask install_packages
 [ -n "$RASPBIAN" ] && dotask install_wolfram
 dotask setup_python_game_examples
-dotask setup_desktop_icons
-dotask hide_redundant_idle_menu_entries
 dotask save_space_using_hardlink
 dotask allow_starting_services
 dotask fingerprint_debian
