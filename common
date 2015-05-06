@@ -279,6 +279,7 @@ EOF
   sudo umount $ROOT_DEV
   detach_image_from_nbd /dev/nbd0
   convert_image temp.$IMGFORMAT ../$2
+  universal_cleanup
 }
 
 disable_starting_services() {
