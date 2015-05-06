@@ -133,8 +133,8 @@ EOF
   [ -n "$RASPBIAN" ] && sudo mv rootfs/etc/ld.so.preload.disable rootfs/etc/ld.so.preload
   if [ -n "$NOOBS" ]; then
     mkdir -p ../noobs
-    sudo tar -C boot -cJf ../noobs/boot.tar.xz --preserve .
-    sudo tar -C rootfs -cJf ../noobs/root.tar.xz --preserve .
+    sudo tar -C boot -cpJf ../noobs/boot.tar.xz .
+    sudo tar -C rootfs -cpJf ../noobs/root.tar.xz .
     cat <<\EOF > ../noobs/partition_setup.sh
 #!/bin/sh
 
