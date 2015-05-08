@@ -278,8 +278,7 @@ EOF
   * Support boot to Scratch
   * Inherit keyboard and language settings from NOOBS
 EOF
-    wget http://asbradbury.org/tmp/raspi/marketing.tar -O ../noobs/marketing.tar
-  
+    tar -C ../marketing -cf ../noobs/marketing.tar .
   fi
   sleep 10
   sudo umount $BOOT_DEV
