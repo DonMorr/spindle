@@ -334,6 +334,35 @@ download_and_extract_firmware_if_necessary() {
   fi
 }
 
+openpi_devicetree() {
+  onvm_chroot sh -l -e - <<\EOF
+wget "http://files.ciseco.co.uk/openPi/openpi-dt-blob.bin" -O /boot/dtblob.bin
+wget "http://files.ciseco.co.uk/openPi/openpi-overlay.dtb" -O /boot/overlays/openpi-overlay.dtb
+
+printf "dtoverlay=openpi" >> /boot/config.txt
+
+EOF
+}
+
+enable_i2c() {
+  onvm_chroot sh -l -e - <<\EOF
+printf "dtparam=i2c_arm" >> /boot/config.txt
+EOF
+}
+
+enable_rtc_overlay() {
+  onvm_chroot sh -l -e - <<\EOF
+printf "dtoverlay=i2c-rtc,ds1307" >> /boot/config.txt
+EOF
+}
+
+enable_lirc_overlay() {
+  onvm_chroot sh -l -e - <<\EOF
+printf "dtoverlay=lirc-rpi,gpio_in_pin=35,gpio_out_pin=33">> /boot/config.txt
+EOF
+}
+
+
 cd $WORKDIR
 dotask branch_image ../$OUTDIR/stage1.$IMGFORMAT $CURIMG
 dotask run_qemu $CURIMG
@@ -350,6 +379,10 @@ dotask configure_inittab
 dotask adjust_motd
 dotask install_firmware
 dotask install_raspi_config
+dotask openpi_devicetree
+dotask enable_i2c
+dotask enable_rtc_overlay
+dotask enable_lirc_overlay
 dotask update_issue
 dotask allow_starting_services
 dotask shutdown_qemu
