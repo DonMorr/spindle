@@ -18,7 +18,7 @@ apt-get install -y screen minicom putty
 apt-get install -y python-setuptools
 easy_install pip
 apt-get install -y i2c-tools
-apt-get install lirc
+apt-get install -y lirc
 
 EOF
 }
@@ -132,7 +132,7 @@ EOF
 }
 
 cd $WORKDIR
-dotask branch_image ../$OUTDIR/stage4-lxdei-edu.$IMGFORMAT $CURIMG
+dotask branch_image ../$OUTDIR/stage4-lxde-edu.$IMGFORMAT $CURIMG
 dotask run_qemu $CURIMG
 dotask disable_starting_services
 dotask mount_apt_cache
