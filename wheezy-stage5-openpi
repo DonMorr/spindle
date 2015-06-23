@@ -42,7 +42,7 @@ apt-get install -y arduino
 #EOF1
 
 cat <<\EOF2 > /etc/udev/rules.d/99-tty.rules
-KERNEL=="ttyAMA0",SYMLINK+="ttyS0" GROUP="dialout"
+KERNEL=="ttyAMA0",SYMLINK+="ttyS1" GROUP="dialout"
 EOF2
 
 
