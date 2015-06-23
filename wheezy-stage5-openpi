@@ -1,0 +1,150 @@
+#!/bin/sh
+# Part of spindle http://asbradbury.org/projects/spindle
+#
+# See LICENSE file for copyright and license details
+
+set -ex
+
+. ./common
+
+WORKDIR=work
+OUTDIR=out
+CURIMG=stage5-openpi.$IMGFORMAT
+
+install_packages() {
+  ssh_in_to_qemu chroot /mnt sh -l -ex - <<\EOF
+apt-get update
+apt-get install -y screen minicom putty
+apt-get install -y python-setuptools
+easy_install pip
+apt-get install -y i2c-tools
+apt-get install lirc
+
+EOF
+}
+
+install_arduino() {
+  onvm_chroot sh -l -e - <<\EOF
+apt-get update
+apt-get install -y arduino
+
+##arduino desktop icon
+#cat <<\EOF1 > /home/pi/Desktop/Arduino.desktop
+#[Desktop Entry]
+#Type=Application
+#Name=Arduino IDE
+#GenericName=Create physical computing projects
+#Exec=arduino
+#Icon=arduino
+#Terminal=false
+#Categories=Development;Engineering;Electronics;
+#MimeType=text/x-arduino
+#EOF1
+
+cat <<\EOF2 > /etc/udev/rules.d/99-tty.rules
+KERNEL=="ttyAMA0",SYMLINK+="ttyS0" GROUP="dialout"
+EOF2
+
+
+
+EOF
+}
+
+install_mono() {
+  onvm_chroot sh -l -e - <<\EOF
+apt-get update
+apt-get install -y mono-complete mono-vbnc
+EOF
+}
+
+install_pilite() {  # pi plite python stuff
+  onvm_chroot sh -l -ex - <<\EOF
+apt-get update
+apt-get install -y python-requests
+pip install arrow
+pip install xively-python
+pip install python-twitter
+EOF
+}
+
+install_wikfiles() {
+  onvm_chroot sh -l -e - <<\EOF
+mkdir /home/pi/Desktop
+mkdir /home/pi/Desktop/WIK_Files
+mkdir /home/pi/Desktop/WIK_Files/Download
+wget -P /home/pi/Desktop/WIK_Files/Download http://files.ciseco.co.uk/WIK/WIK_1.02.zip
+unzip /home/pi/Desktop/WIK_Files/Download/WIK_1.02.zip -d /home/pi/Desktop/WIK_Files
+
+# remove mac foler
+find /home/pi/Desktop/ -name "__MACOSX" -exec rm -rv {} \;
+# remove .DS_Store files
+find /home/pi/Desktop -name ".DS_Store" -exec rm -v {} \;
+
+mkdir /home/pi/sketchbook/
+cp -r /home/pi/Desktop/WIK_Files/Arduino/. /home/pi/sketchbook/
+
+EOF
+}
+
+install_llapfiles() {
+  onvm_chroot sh -l -e - <<\EOF
+mkdir /home/pi/Desktop
+mkdir /home/pi/Desktop/LLAP_Files
+mkdir /home/pi/Desktop/LLAP_Files/Download
+wget -P /home/pi/Desktop/LLAP_Files/Download http://files.ciseco.co.uk/LLAP/LLAP_0.12.zip
+unzip /home/pi/Desktop/LLAP_Files/Download/LLAP_0.12.zip -d /home/pi/Desktop/LLAP_Files
+
+# remove mac foler
+find /home/pi/Desktop/ -name "__MACOSX" -exec rm -rv {} \;
+# remove .DS_Store files
+find /home/pi/Desktop -name ".DS_Store" -exec rm -v {} \;
+
+EOF
+}
+
+enable_rtc() {
+  onvm_chroot sh -l -e - <<\EOF
+patch <<\EOF2
+--- /etc/init.d/hwclock.sh      2012-12-22 05:57:47.000000000 +0000
++++ /etc/init.d/hwclock.sh      2015-06-22 14:31:03.732358696 +0000
+@@ -61,9 +61,9 @@
+                printf "0.0 0 0.0\n0\nUTC" > /etc/adjtime
+            fi
+ 
+-           if [ -d /run/udev ] || [ -d /dev/.udev ]; then
+-               return 0
+-           fi
++#          if [ -d /run/udev ] || [ -d /dev/.udev ]; then
++#              return 0
++#          fi
+ 
+            if [ "$HWCLOCKACCESS" != no ]; then
+                log_action_msg "Setting the system clock"
+hwclock.patch (END)
+EOF2
+
+apt-get remove fake-hwclock
+rm /etc/cron.hourly/fake-hwclock
+update-rc.d -f fake-hwclock remove
+rm /etc/init.d/fake-hwclock
+update-rc.d hwclock.sh enable
+EOF
+}
+
+cd $WORKDIR
+dotask branch_image ../$OUTDIR/stage4-lxdei-edu.$IMGFORMAT $CURIMG
+dotask run_qemu $CURIMG
+dotask disable_starting_services
+dotask mount_apt_cache
+dotask install_packages
+dotask install_arduino
+#dotask install_mono
+dotask install_wikfiles
+dotask install_llapfiles
+dotask enable_rtc
+dotask save_space_using_hardlink
+dotask allow_starting_services
+dotask fingerprint_debian
+dotask update_issue
+dotask shutdown_qemu
+dotask finish_image
