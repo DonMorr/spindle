@@ -339,26 +339,26 @@ openpi_devicetree() {
 wget "http://files.ciseco.co.uk/openPi/openpi-dt-blob.bin" -O /boot/dtblob.bin
 wget "http://files.ciseco.co.uk/openPi/openpi-overlay.dtb" -O /boot/overlays/openpi-overlay.dtb
 
-printf "dtoverlay=openpi" >> /boot/config.txt
+printf "dtoverlay=openpi\n" >> /boot/config.txt
 
 EOF
 }
 
 enable_i2c() {
   onvm_chroot sh -l -e - <<\EOF
-printf "dtparam=i2c_arm" >> /boot/config.txt
+printf "dtparam=i2c_arm\n" >> /boot/config.txt
 EOF
 }
 
 enable_rtc_overlay() {
   onvm_chroot sh -l -e - <<\EOF
-printf "dtoverlay=i2c-rtc,ds1307" >> /boot/config.txt
+printf "dtoverlay=i2c-rtc,ds1307\n" >> /boot/config.txt
 EOF
 }
 
 enable_lirc_overlay() {
   onvm_chroot sh -l -e - <<\EOF
-printf "dtoverlay=lirc-rpi,gpio_in_pin=35,gpio_out_pin=33">> /boot/config.txt
+printf "dtoverlay=lirc-rpi,gpio_in_pin=35,gpio_out_pin=33\n">> /boot/config.txt
 EOF
 }
 
