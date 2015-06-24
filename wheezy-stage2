@@ -364,6 +364,12 @@ printf "dtoverlay=lirc-rpi,gpio_in_pin=35,gpio_out_pin=33\n">> /boot/config.txt
 EOF
 }
 
+update_kernel() {
+ onvm_chroot sh -l -e - <<\EOF
+apt-get install -y rpi-update
+SKIP_BACKUP=1 rpi-update d3e6f4a27d87c5229ad6c74fa9022a9451046add
+EOF
+}
 
 cd $WORKDIR
 dotask branch_image ../$OUTDIR/stage1.$IMGFORMAT $CURIMG
@@ -381,6 +387,7 @@ dotask configure_inittab
 dotask adjust_motd
 dotask install_firmware
 dotask install_raspi_config
+dotask update_kernel
 dotask openpi_devicetree
 dotask enable_i2c
 dotask enable_rtc_overlay
