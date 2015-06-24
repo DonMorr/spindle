@@ -346,7 +346,9 @@ EOF
 
 enable_i2c() {
   onvm_chroot sh -l -e - <<\EOF
+printf "dtparam=i2c1=on\n" >> /boot/config.txt
 printf "dtparam=i2c_arm\n" >> /boot/config.txt
+printf 'i2c_dev\n' >> /etc/modules
 EOF
 }
 
