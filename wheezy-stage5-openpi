@@ -14,7 +14,7 @@ CURIMG=stage5-openpi.$IMGFORMAT
 install_packages() {
   ssh_in_to_qemu chroot /mnt sh -l -ex - <<\EOF
 apt-get update
-apt-get install -y screen minicom putty
+apt-get install -y screen minicom putty vim
 apt-get install -y python-setuptools
 easy_install pip
 apt-get install -y i2c-tools
