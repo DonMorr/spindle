@@ -71,6 +71,7 @@ install_wikfiles() {
   onvm_chroot sh -l -e - <<\EOF
 if [ ! -d /home/pi/Desktop ]; then
   mkdir /home/pi/Desktop
+  chown pi:pi /home/pi/Desktop
 fi
 mkdir /home/pi/Desktop/WIK_Files
 mkdir /home/pi/Desktop/WIK_Files/Download
@@ -80,6 +81,7 @@ unzip /home/pi/Desktop/WIK_Files/Download/WIK_1.02.zip -d /home/pi/Desktop/WIK_F
 mkdir /home/pi/sketchbook/
 cp -r /home/pi/Desktop/WIK_Files/Arduino/. /home/pi/sketchbook/
 
+chown -R pi:pi /home/pi/
 EOF
 }
 
@@ -87,12 +89,14 @@ install_llapfiles() {
   onvm_chroot sh -l -e - <<\EOF
 if [ ! -d /home/pi/Desktop ]; then
   mkdir /home/pi/Desktop
+  chown pi:pi /home/pi/Desktop
 fi
 mkdir /home/pi/Desktop/LLAP_Files
 mkdir /home/pi/Desktop/LLAP_Files/Download
 wget -P /home/pi/Desktop/LLAP_Files/Download http://files.ciseco.co.uk/LLAP/LLAP_0.12.zip
 unzip /home/pi/Desktop/LLAP_Files/Download/LLAP_0.12.zip -d /home/pi/Desktop/LLAP_Files
 
+chown -R pi:pi /home/pi/
 EOF
 }
 
@@ -117,10 +121,10 @@ patch -f -l -p1 -d / <<\EOF2
 hwclock.patch (END)
 EOF2
 
-apt-get remove -y fake-hwclock
+#apt-get remove -y fake-hwclock
 rm /etc/cron.hourly/fake-hwclock
 update-rc.d -f fake-hwclock remove
-rm /etc/init.d/fake-hwclock
+#rm /etc/init.d/fake-hwclock
 update-rc.d hwclock.sh enable
 EOF
 }
